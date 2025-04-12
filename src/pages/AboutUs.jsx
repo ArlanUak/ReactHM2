@@ -1,11 +1,18 @@
+import React from "react";
+import LibrarySlider from "../components/LibrarySlider";
+
 export default function AboutUs() {
-    return (
-        <>
-        <section className="second" id="library">
+  return (
+    <>
+      <section className="second" id="library">
         <div className="container">
           <div className="second__container">
             <p className="second__header">
-              IT Library – <span>онлайн-платформа для поиска и изучения лучших книг по программированию и технологиям</span>
+              IT Library –{" "}
+              <span>
+                онлайн-платформа для поиска и изучения лучших книг по
+                программированию и технологиям
+              </span>
             </p>
             <div className="second__grid">
               <div className="second__item">
@@ -32,7 +39,9 @@ export default function AboutUs() {
       <section className="third" id="benefits">
         <div className="container">
           <div className="third__container">
-            <h1 className="third__header">Что вы получите от нашей библиотеки</h1>
+            <h1 className="third__header">
+              Что вы получите от нашей библиотеки
+            </h1>
             <div className="third__grid">
               <div className="third__item">
                 <h3>Доступ к знаниям</h3>
@@ -49,8 +58,8 @@ export default function AboutUs() {
             </div>
           </div>
         </div>
-      </section>   
-      </>
+      </section>
+      <LibrarySlider/>
+    </>
   );
-
 }

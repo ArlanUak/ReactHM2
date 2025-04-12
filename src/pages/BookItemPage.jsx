@@ -11,10 +11,8 @@ export default function BookItemPage() {
   const [reviews, setReviews] = useState([]);
   const [newReview, setNewReview] = useState("");
   const [rating, setRating] = useState(5);
-  const [favorites, setFavorites] = useState([]);
-  const [isModalOpen, setModalOpen] = useState(false);
 
-  const { user, login, logout } = useAuth(); // Получаем данные из контекста
+  const { user, favorites, addToFavorites, removeFromFavorites } = useAuth();
 
   useEffect(() => {
     fetch(`https://api.itbook.store/1.0/books/${isbn13}`)
@@ -27,11 +25,7 @@ export default function BookItemPage() {
   useEffect(() => {
     const storedReviews = JSON.parse(localStorage.getItem(`reviews_${isbn13}`)) || [];
     setReviews(storedReviews);
-  
-    const storedFavorites = JSON.parse(localStorage.getItem("favorites") || "[]");
-    setFavorites(storedFavorites); // ✅ Загружаем избранное
   }, [isbn13]);
-  
 
   const handleReviewSubmit = () => {
     if (!user) {
@@ -49,26 +43,20 @@ export default function BookItemPage() {
     setRating(5);
   };
 
+  const isFavorite = favorites.some(book => book.isbn13 === isbn13);
+
   const toggleFavorite = () => {
     if (!user) {
       alert("Только авторизованные пользователи могут добавлять книги в избранное!");
       return;
     }
-  
-    let storedFavorites = JSON.parse(localStorage.getItem("favorites") || "[]");
-  
-    let updatedFavorites;
-    if (storedFavorites.includes(isbn13)) {
-      updatedFavorites = storedFavorites.filter(id => id !== isbn13);
+
+    if (isFavorite) {
+      removeFromFavorites(isbn13);
     } else {
-      updatedFavorites = [...storedFavorites, isbn13]; 
+      addToFavorites(book);
     }
-  
-    setFavorites(updatedFavorites); // ✅ Обновляем состояние
-    localStorage.setItem("favorites", JSON.stringify(updatedFavorites));
   };
-  
-  
 
   if (isLoading) return <Loader />;
   if (!book) return <p>Книга не найдена</p>;
@@ -76,26 +64,27 @@ export default function BookItemPage() {
   return (
     <div className="book__details">
       <div className="book_main">
-      <div className="book__main-info">
-        <h2>{book.title}</h2>
-        <img src={book.image} alt={book.title} />
-        <p><strong>Цена:</strong> {book.price}</p>
-        <Link to={book.url} target="_blank" rel="noopener noreferrer" className="buy-button">
-          Купить
-        </Link>
-        <button onClick={toggleFavorite} className="favorite-button">
-          {favorites.includes(isbn13) ? "Удалить из избранного" : "Добавить в избранное"}
-        </button>
+        <div className="book__main-info">
+          <h2>{book.title}</h2>
+          <img src={book.image} alt={book.title} />
+          <p><strong>Цена:</strong> {book.price}</p>
+          <Link to={book.url} target="_blank" rel="noopener noreferrer" className="buy-button">
+            Купить
+          </Link>
+          <button onClick={toggleFavorite} className="favorite-button">
+            {isFavorite ? "Удалить из избранного" : "Добавить в избранное"}
+          </button>
+        </div>
+        <div className="book__info">
+          <p><strong>Автор:</strong> {book.authors}</p>
+          <p><strong>Издатель:</strong> {book.publisher}</p>
+          <p><strong>Страниц:</strong> {book.pages}</p>
+          <p><strong>Год:</strong> {book.year}</p>
+          <p><strong>Рейтинг:</strong> {book.rating}/5</p>
+          <p><strong>Описание:</strong> {book.desc}</p>
+        </div>
       </div>
-      <div className="book__info">
-        <p><strong>Автор:</strong> {book.authors}</p>
-        <p><strong>Издатель:</strong> {book.publisher}</p>
-        <p><strong>Страниц:</strong> {book.pages}</p>
-        <p><strong>Год:</strong> {book.year}</p>
-        <p><strong>Рейтинг:</strong> {book.rating}/5</p>
-        <p><strong>Описание:</strong> {book.desc}</p>
-      </div>
-      </div>
+      
       {/* Отзывы */}
       <div className="reviews-section">
         <h3>Отзывы</h3>

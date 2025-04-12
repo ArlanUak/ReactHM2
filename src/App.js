@@ -1,6 +1,4 @@
-import logo from "./logo.svg";
 import "./style/styles.css";
-import Header from "./components/Header";
 import { Routes, Route } from "react-router-dom";
 import MainPage from "./pages/MainPage";
 import AboutUs from "./pages/AboutUs";
@@ -10,66 +8,24 @@ import BookItemPage from "./pages/BookItemPage";
 import { AuthProvider } from "./context/AuthContext";
 import UserProfile from "./pages/UserProfile";
 import { useState } from "react";
+import Layout from "./components/Layout";
 
 function App() {
   const [query, setQuery] = useState("");
-  return (
-    <>
-      <AuthProvider>
-        <Header onSearch={setQuery} />
-        <Routes>
-          <Route
-            path="/"
-            element={
-              <div className="container">
-                <MainPage />
-              </div>
-            }
-          />
-          <Route
-            path="/about"
-            element={
-              <div className="container">
-                <AboutUs />
-              </div>
-            }
-          />
-          <Route
-            path="/books"
-            element={
-              <div className="container">
-                <BooksPage query={query} />
-              </div>
-            }
-          />
 
-          <Route
-            path="/books/:isbn13"
-            element={
-              <div className="container">
-                <BookItemPage />
-              </div>
-            }
-          />
-          <Route
-            path="*"
-            element={
-              <div className="container">
-                <NotFound />
-              </div>
-            }
-          />
-          <Route
-            path="/profile"
-            element={
-              <div className="container">
-                <UserProfile />
-              </div>
-            }
-          />
-        </Routes>
-      </AuthProvider>
-    </>
+  return (
+    <AuthProvider>
+      <Routes>
+        <Route path="/" element={<Layout onSearch={setQuery} />}>
+          <Route index element={<MainPage />} />
+          <Route path="about" element={<AboutUs />} />
+          <Route path="books" element={<BooksPage query={query} />} />
+          <Route path="books/:isbn13" element={<BookItemPage />} />
+          <Route path="profile" element={<UserProfile />} />
+          <Route path="*" element={<NotFound />} />
+        </Route>
+      </Routes>
+    </AuthProvider>
   );
 }
 
