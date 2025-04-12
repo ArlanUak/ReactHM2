@@ -7,10 +7,25 @@ export const AuthProvider = ({ children }) => {
   const [favorites, setFavorites] = useState([]);
 
   useEffect(() => {
-    const storedUser = JSON.parse(localStorage.getItem("user"));
-    const storedFavorites = JSON.parse(localStorage.getItem("favorites")) || [];
-    setUser(storedUser);
-    setFavorites(storedFavorites);
+    try {
+      const userFromStorage = localStorage.getItem("user");
+      if (userFromStorage && userFromStorage !== "undefined") {
+        setUser(JSON.parse(userFromStorage));
+      }
+    } catch (e) {
+      console.error("Ошибка при парсинге user:", e);
+      localStorage.removeItem("user"); // удаляем битые данные
+    }
+
+    try {
+      const favoritesFromStorage = localStorage.getItem("favorites");
+      if (favoritesFromStorage && favoritesFromStorage !== "undefined") {
+        setFavorites(JSON.parse(favoritesFromStorage));
+      }
+    } catch (e) {
+      console.error("Ошибка при парсинге favorites:", e);
+      localStorage.removeItem("favorites");
+    }
   }, []);
 
   const login = (userData) => {
@@ -45,7 +60,7 @@ export const AuthProvider = ({ children }) => {
     >
       {children}
     </AuthContext.Provider>
-  );  
+  );
 };
 
 export const useAuth = () => {

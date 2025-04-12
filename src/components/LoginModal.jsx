@@ -3,7 +3,7 @@ import { useForm } from "react-hook-form";
 import { useAuth } from "../context/AuthContext";
 
 const LoginModal = ({ onClose }) => {
-  const { login } = useAuth();
+  const { login } = useAuth();  // Получаем функцию login из контекста
 
   const {
     register,
@@ -11,10 +11,33 @@ const LoginModal = ({ onClose }) => {
     formState: { errors },
   } = useForm();
 
-  const onSubmit = (data) => {
-    console.log("Вход:", data);
-    login(data);
-    onClose();
+  const onSubmit = async (data) => {
+    try {
+      const response = await fetch("https://backendbookproject.onrender.com/api/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+
+      if (!response.ok) {
+        throw new Error("Неверный логин или пароль");
+      }
+
+      const result = await response.json();
+      console.log("Успешный вход:", result);
+
+      // Сохраняем пользователя в контекст
+      login(result.user); // Теперь мы используем функцию login из контекста
+
+      // Сохраняем данные в localStorage (уже реализовано в контексте)
+      localStorage.setItem("token", result.token);
+
+      onClose(); // Закрываем модал
+    } catch (err) {
+      alert(err.message); // Покажем ошибку, если вход не удался
+    }
   };
 
   return (
@@ -23,10 +46,10 @@ const LoginModal = ({ onClose }) => {
         <h2>Вход</h2>
         <form onSubmit={handleSubmit(onSubmit)}>
           <input
-            {...register("username", { required: "Введите логин" })}
-            placeholder="Логин"
+            {...register("email", { required: "Введите почту" })}
+            placeholder="Почта"
           />
-          {errors.username && <p className="error">{errors.username.message}</p>}
+          {errors.email && <p className="error">{errors.email.message}</p>}
 
           <input
             type="password"
