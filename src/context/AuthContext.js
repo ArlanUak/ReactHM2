@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 
 const AuthContext = createContext();
 
@@ -6,63 +6,73 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [favorites, setFavorites] = useState([]);
 
-  useEffect(() => {
-    try {
-      const userFromStorage = localStorage.getItem("user");
-      if (userFromStorage && userFromStorage !== "undefined") {
-        setUser(JSON.parse(userFromStorage));
-      }
-    } catch (e) {
-      console.error("Ошибка при парсинге user:", e);
-      localStorage.removeItem("user"); // удаляем битые данные
-    }
-
-    try {
-      const favoritesFromStorage = localStorage.getItem("favorites");
-      if (favoritesFromStorage && favoritesFromStorage !== "undefined") {
-        setFavorites(JSON.parse(favoritesFromStorage));
-      }
-    } catch (e) {
-      console.error("Ошибка при парсинге favorites:", e);
-      localStorage.removeItem("favorites");
-    }
-  }, []);
-
-  const login = (userData) => {
+  const login = (userData, token) => {
     setUser(userData);
     localStorage.setItem("user", JSON.stringify(userData));
+    localStorage.setItem("token", token);
   };
 
   const logout = () => {
     setUser(null);
     setFavorites([]);
     localStorage.removeItem("user");
+    localStorage.removeItem("token");
     localStorage.removeItem("favorites");
   };
 
   const addToFavorites = (book) => {
     if (!favorites.find((fav) => fav.isbn13 === book.isbn13)) {
-      const updatedFavorites = [...favorites, book];
-      setFavorites(updatedFavorites);
-      localStorage.setItem("favorites", JSON.stringify(updatedFavorites));
+      const updated = [...favorites, book];
+      setFavorites(updated);
+      localStorage.setItem("favorites", JSON.stringify(updated));
     }
   };
 
   const removeFromFavorites = (isbn13) => {
-    const updatedFavorites = favorites.filter((book) => book.isbn13 !== isbn13);
-    setFavorites(updatedFavorites);
-    localStorage.setItem("favorites", JSON.stringify(updatedFavorites));
+    const updated = favorites.filter((book) => book.isbn13 !== isbn13);
+    setFavorites(updated);
+    localStorage.setItem("favorites", JSON.stringify(updated));
   };
+
+  useEffect(() => {
+    try {
+      const savedUser = localStorage.getItem("user");
+      if (savedUser && savedUser !== "undefined") {
+        setUser(JSON.parse(savedUser));
+      }
+    } catch (e) {
+      console.error("Ошибка парсинга savedUser:", e);
+      localStorage.removeItem("user");
+    }
+  
+    try {
+      const savedFavorites = localStorage.getItem("favorites");
+      if (savedFavorites && savedFavorites !== "undefined") {
+        setFavorites(JSON.parse(savedFavorites));
+      }
+    } catch (e) {
+      console.error("Ошибка парсинга savedFavorites:", e);
+      localStorage.removeItem("favorites");
+    }
+  }, []);
+  
 
   return (
     <AuthContext.Provider
-      value={{ user, setUser, login, logout, favorites, addToFavorites, removeFromFavorites }}
+      value={{
+        user,
+        setUser,
+        favorites,
+        login,
+        logout,
+        addToFavorites,
+        removeFromFavorites,
+        isAuthenticated: !!user,
+      }}
     >
       {children}
     </AuthContext.Provider>
   );
 };
 
-export const useAuth = () => {
-  return useContext(AuthContext);
-};
+export const useAuth = () => useContext(AuthContext);

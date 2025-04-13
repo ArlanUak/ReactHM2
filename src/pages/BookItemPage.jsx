@@ -92,7 +92,7 @@ export default function BookItemPage() {
           {reviews.length > 0 ? (
             reviews.map((review, index) => (
               <div key={index} className="review-item">
-                <p><strong>{review.username}</strong> ({review.rating}/5)</p>
+                <p><strong>{review.name}</strong> ({review.rating}/5)</p>
                 <p>{review.text}</p>
               </div>
             ))

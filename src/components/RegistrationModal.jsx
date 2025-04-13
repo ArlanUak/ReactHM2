@@ -20,12 +20,20 @@ const RegistrationModal = ({ onClose }) => {
         body: JSON.stringify(formData),
       });
 
-      const data = await res.json();
+      const text = await res.text(); // Получаем как текст, чтобы поймать ошибки JSON
+      let data = {};
+
+      try {
+        data = JSON.parse(text); // Парсим вручную
+      } catch (err) {
+        console.warn("Ошибка парсинга JSON:", text);
+      }
+
       console.log("Ответ сервера:", data);
       console.log("Код ответа:", res.status);
-      
+
       if (res.ok) {
-        localStorage.setItem("user", JSON.stringify(data.user || formData)); // если backend возвращает `user`, лучше его сохранить
+        localStorage.setItem("user", JSON.stringify(data.user || formData));
         setUser(data.user || formData);
         setMessage("Регистрация прошла успешно!");
         onClose();
@@ -33,6 +41,7 @@ const RegistrationModal = ({ onClose }) => {
         setMessage(data.message || "Ошибка при регистрации");
       }
     } catch (err) {
+      console.error("Ошибка подключения к серверу:", err);
       setMessage("Ошибка подключения к серверу");
     }
   };
@@ -46,7 +55,7 @@ const RegistrationModal = ({ onClose }) => {
             {...register("name", { required: "Введите имя пользователя" })}
             placeholder="Имя пользователя"
           />
-          {errors.username && <p className="error">{errors.username.message}</p>}
+          {errors.name && <p className="error">{errors.name.message}</p>}
 
           <input
             type="email"

@@ -1,16 +1,16 @@
 import React, { useState } from "react";
 import { useAuth } from "../context/AuthContext";
-import { Link, useNavigate } from "react-router-dom"; // ← добавили useNavigate
+import { Link, useNavigate } from "react-router-dom";
 import RegistrationModal from "../components/RegistrationModal";
 
 const UserProfile = () => {
   const { user, logout, favorites, removeFromFavorites } = useAuth();
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const navigate = useNavigate(); // ← инициализируем navigate
+  const navigate = useNavigate();
 
   const handleLogout = () => {
-    logout();           // сначала выходим
-    navigate("/");      // потом перенаправляем на главную
+    logout();
+    navigate("/");
   };
 
   return (
@@ -18,7 +18,7 @@ const UserProfile = () => {
       {user ? (
         <div className="user-profile">
           <div className="profile__top">
-            <h2>Привет, {user.username}!</h2>
+            <h2>Привет, {user.name}!</h2>
             <button onClick={handleLogout} className="logout__btn">Выйти</button>
           </div>
           <div className="books">

@@ -3,8 +3,7 @@ import { useForm } from "react-hook-form";
 import { useAuth } from "../context/AuthContext";
 
 const LoginModal = ({ onClose }) => {
-  const { login } = useAuth();  // Получаем функцию login из контекста
-
+  const { login } = useAuth();  
   const {
     register,
     handleSubmit,
@@ -26,17 +25,11 @@ const LoginModal = ({ onClose }) => {
       }
 
       const result = await response.json();
-      console.log("Успешный вход:", result);
-
-      // Сохраняем пользователя в контекст
-      login(result.user); // Теперь мы используем функцию login из контекста
-
-      // Сохраняем данные в localStorage (уже реализовано в контексте)
-      localStorage.setItem("token", result.token);
-
-      onClose(); // Закрываем модал
+      console.log(result);       
+      login(result.user, result.token);
+      onClose();
     } catch (err) {
-      alert(err.message); // Покажем ошибку, если вход не удался
+      alert(err.message);
     }
   };
 
